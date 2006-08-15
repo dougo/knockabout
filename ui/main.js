@@ -56,7 +56,7 @@ function makeDieText(owner, face) {
   text.setAttribute("font-size", 120);
   text.setAttribute("y", 45);
   if (owner == 1) text.setAttribute("fill", "white");
-  text.appendChild(document.createTextNode(face));
+  text.textContent = face;
   return text;
 }
 
