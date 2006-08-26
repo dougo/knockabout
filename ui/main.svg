@@ -2,7 +2,24 @@
 
 <svg xmlns="http://www.w3.org/2000/svg" version="1.2"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  viewBox="0 0 4000 4000" preserveAspectRatio="xMidYMid">
+  title="Knockabout"
+  viewBox="0 0 30 30" preserveAspectRatio="xMidYMid">
+
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/"
+	    xmlns:vo="http://volity.org/protocol/metadata">
+    <dc:title>Knockabout</dc:title>
+    <dc:creator>Doug Orleans</dc:creator>
+    <dc:created>2006-08-18</dc:created>
+    <dc:modified>2006-08-18</dc:modified>
+    <dc:language>en</dc:language>
+    <dc:description>
+      A 2-player strategy game of position and calculation.
+    </dc:description>
+    <vo:version>0</vo:version>
+    <vo:ruleset>http://steak.place.org/knockabout/ruleset/</vo:ruleset>
+    <vo:description-url>http://steak.place.org/knockabout/</vo:description-url>
+  </metadata>
+
   <defs>
     <style type="text/css">
     <![CDATA[
@@ -11,23 +28,11 @@
       }
     ]]>
     </style>
-
-    <!--
-         Archimedes's approximation for sqrt(3) is 265/153.  This
-         means we can use circles of radius 153 and stack them in columns
-         of width 265.  Neat, huh?
-     !-->
-    <circle id="space" r="153" fill="#7CCD7C" stroke="black" />
-    <!-- #7CCD7C = PaleGreen3 !-->
-
   </defs>
   
-  <text id="title" x="100" y="200" font-family="sans-serif" font-size="200">
+  <text id="title" x="0" y="3" font-family="sans-serif" font-size="2">
      Knockabout
   </text>
-
-  <g id="board">
-  </g>
 
   <script xlink:href="main.js" />
 
