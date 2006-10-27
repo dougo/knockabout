@@ -3,7 +3,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" version="1.2"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   title="Knockabout"
-  viewBox="0 0 30 30" preserveAspectRatio="xMidYMid">
+  viewBox="0 0 24 24" preserveAspectRatio="xMidYMid">
 
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/"
 	    xmlns:vo="http://volity.org/protocol/metadata">
@@ -30,7 +30,7 @@
     </style>
   </defs>
   
-  <text id="title" x="0" y="3" font-family="sans-serif" font-size="2">
+  <text id="title" x="0" y="3" font-family="sans-serif" font-size="1.5">
      Knockabout
   </text>
 
