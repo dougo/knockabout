@@ -26,8 +26,16 @@ diamondPoints =
   "0," + (-SQRT3/2+0.1) + " " + "0.5,0 " +
   "0," + (SQRT3/2-0.1) + " " + "-0.5,0";
 
-function makeGroup(parent) {
-  return parent.appendChild(document.createElementNS(svgNS, "g"));
+// The shape of an arrow pointing through the north edge of a hex,
+// height = sqrt(3)/2, width = 1.
+arrowPoints =
+  "0," + -SQRT3*7/8 +
+  " 0.5," + -SQRT3*5/8 + " 0.25," + -SQRT3*5/8 +
+  " 0.25," + -SQRT3*3/8 + " -0.25," + -SQRT3*3/8 +
+  " -0.25," + -SQRT3*5/8 + " -0.5," + -SQRT3*5/8;
+
+function makeGroup() {
+  return document.createElementNS(svgNS, "g");
 }
 
 function makeHex() {
@@ -53,9 +61,9 @@ function isGutterRC(row, col) {
 	  row-col == 6 || row-col == -6);
 }
 
-function makeBoard(parent) {
-  var board = makeGroup(parent);
-  moveXY(board, 15, 15);
+function makeBoard() {
+  var board = makeGroup();
+  moveXY(board, 12, 12);
   var gutter = makeHex();
   gutter.setAttribute("transform", "rotate(30) scale(" + 6*SQRT3 + ")");
   gutter.setAttribute("stroke", PaleGreen4);
@@ -63,8 +71,8 @@ function makeBoard(parent) {
   gutter.setAttribute("fill-opacity", 0);
   board.appendChild(gutter);
 
-  for (col = 0; col < 13; col++) {
-    for (row = Math.max(0, col - 6); row < Math.min(col + 7, 13); row++) {
+  for (var col = 0; col < 13; col++) {
+    for (var row = Math.max(0, col - 6); row < Math.min(col + 7, 13); row++) {
       var hex = makeHex();
       hex.setAttribute("fill", PaleGreen3);
       hex.setAttribute("stroke", "black");
@@ -73,7 +81,7 @@ function makeBoard(parent) {
       if (isGutterRC(row, col))
 	// Gutter space, shrink to half size.
 	hex.setAttribute("transform", hex.getAttribute("transform")
-			 + "scale(0.5)");
+			 + " scale(0.5)");
       board.appendChild(hex);
     }
   }
@@ -115,40 +123,66 @@ function makeDieText(owner, face) {
   return text;
 }
 
-function makeDice(parent) {
-  var dice = makeGroup(parent);
+function makeArrow(group, dir) {
+  var arrow = document.createElementNS(svgNS, "polygon");
+  arrow.setAttribute("points", arrowPoints);
+  arrow.setAttribute("stroke", "black");
+  arrow.setAttribute("fill", "red");
+  arrow.setAttribute("stroke-width", 0.05);
+  arrow.setAttribute("transform", "rotate(" + dir*60 + ")");
+  arrow.setAttribute("onactivate", "moveDie(" + dir + ")");
+  return group.appendChild(arrow);
+}
 
-  function makeDie(owner, row, col, size, face) {
-    var die = document.createElementNS(svgNS, "g");
-    die.appendChild(makeDieShape(owner, size));
-    die.appendChild(makeDieText(owner, face));
-    moveRC(die, row, col);
-    return dice.appendChild(die);
-  }
+function makeArrows() {
+  var arrows = makeGroup();
+  for (var dir = 0; dir < 6; dir++)
+    makeArrow(arrows, dir);
+  return arrows;
+}
 
-  makeDie(0, 4, 3, 4, 1);
-  makeDie(0, 5, 5, 4, 1);
-  makeDie(0, 6, 7, 4, 1);
-  makeDie(0, 7, 9, 4, 1);
-  makeDie(0, 3, 4, 6, 2);
-  makeDie(0, 4, 6, 6, 2);
-  makeDie(0, 5, 8, 6, 2);
-  makeDie(0, 2, 5, 8, 3);
-  makeDie(0, 3, 7, 8, 3);
+function activateDie(row, col) {
+  activatedPosition = [row, col];
+  // TO DO: in the gutter, don't show all 6 arrows!
+  moveRC(arrows, row, col);
+  board.appendChild(arrows);
+}
 
-  makeDie(1, 5, 3, 4, 1);
-  makeDie(1, 6, 5, 4, 1);
-  makeDie(1, 7, 7, 4, 1);
-  makeDie(1, 8, 9, 4, 1);
-  makeDie(1, 7, 4, 6, 2);
-  makeDie(1, 8, 6, 6, 2);
-  makeDie(1, 9, 8, 6, 2);
-  makeDie(1, 9, 5, 8, 3);
-  makeDie(1, 10, 7, 8, 3);
-
-  return dice;
+function moveDie(dir) {
+  rpc("move", activatedPosition, dir);
+  board.removeChild(arrows);
 }
 
 root = document.documentElement;
-board = makeBoard(root);
-dice = makeDice(board);
+board = root.appendChild(makeBoard());
+arrows = makeArrows();
+dice = null;
+
+/**
+ * The configs parameter is a struct; each property name is a seat
+ * name and its value is a seat configuration.
+ * A seat configuration is an array of dice configurations.
+ * A dice configuration is an array of structs; each struct has the
+ * properties row, col, size, face.
+ */
+game.setDice = function(configs) {
+  if (dice) board.removeChild(dice);
+  dice = makeGroup();
+  for (var seatName in configs) {
+    var seatConfig = configs[seatName];
+    for (var dieNum in seatConfig) {
+      var dieConfig = seatConfig[dieNum];
+      var die = document.createElementNS(svgNS, "g");
+      die.appendChild(makeDieShape(seatName, dieConfig.size));
+      die.appendChild(makeDieText(seatName, dieConfig.face));
+      moveRC(die, dieConfig.row, dieConfig.col);
+      die.setAttribute("onactivate",
+		       "activateDie(" +
+		       dieConfig.row + "," +
+		       dieConfig.col + ")");
+      dice.appendChild(die);
+    }
+  }
+  board.appendChild(dice);
+  return true;
+}
