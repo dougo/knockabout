@@ -1,11 +1,12 @@
 ;;; Game seats.
 
-(module seat "swindle.ss"
-  (provide (all-defined))
+#lang swindle
 
-  (define <seat> <exact-integer>)
-  (define *seats* (list 0 1))
+(provide (all-defined))
 
-  ;; The next seat in turn order.
-  (defmethod (next-seat (seat <seat>)) (modulo (1+ seat) 2))
-)
+(define <seat> <exact-integer>)
+(define *seats* (list 0 1))
+
+;; The next seat in turn order.
+(defmethod (next-seat (seat <seat>)) (modulo (1+ seat) 2))
+
